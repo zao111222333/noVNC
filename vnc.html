@@ -46,6 +46,35 @@
 
     <script type="module" crossorigin="anonymous" src="app/error-handler.js"></script>
     <script type="module" crossorigin="anonymous" src="app/ui.js"></script>
+    <script>
+        window.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                document.getElementById("noVNC_connect_button").click();
+            }
+        })
+        window.addEventListener("load", ()=>{
+            setVNCPort();
+            setScalingMode();
+        }, true); 
+        function setVNCPort(){
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const display_num = urlParams.get('display');
+            const username = urlParams.get('u');
+            if (username != null){
+                document.getElementById("username").value=username;
+            }
+            if (display_num != null){
+                document.getElementById("noVNC_display_num").value=display_num;
+            }
+            if (username != null && display_num != null){
+                setTimeout(() => document.getElementById("password").focus(), 100);
+            }
+        }; 
+        function setScalingMode(){
+            document.getElementById("noVNC_setting_resize").value="scale";
+        }
+    </script>
 </head>
 
 <body>
@@ -263,6 +292,34 @@
         <div id="noVNC_connect_dlg">
             <p class="noVNC_logo" translate="no"><span>no</span>VNC</p>
             <div>
+                <form action="javascript:document.getElementById('noVNC_connect_button').click();" style="margin-bottom: 10px;">
+                    <table style="width:100%">
+                        <tr>
+                          <td>
+                            <h style="color: #CDDC39;">Username</h>
+                          </td>
+                          <td>
+                            <input type="text" id="username" placeholder="username" style="margin-left: 5px;"><br>
+                          </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h style="color: #CDDC39;">#Display</h>
+                            </td>
+                            <td>
+                                <input type="text" id="noVNC_display_num" placeholder="0" style="margin-left: 5px;"><br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h style="color: #CDDC39;">Password</h>
+                            </td>
+                            <td>
+                                <input type="password" id="password" placeholder="" style="margin-left: 5px;"><br>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
                 <button id="noVNC_connect_button">
                     <img alt="" src="app/images/connect.svg"> Connect
                 </button>
@@ -300,7 +357,7 @@
         <div class="noVNC_heading">
             Credentials
         </div>
-        <div id="noVNC_username_block">
+        <div id="noVNC_username_block" style="display: none;">
             <label for="noVNC_username_input">Username:</label>
             <input id="noVNC_username_input">
         </div>

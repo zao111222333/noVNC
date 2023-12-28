@@ -1005,7 +1005,13 @@ const UI = {
         if (typeof UI.rfb !== 'undefined') {
             return;
         }
-
+        let noVNC_display_num = (document.getElementById("noVNC_display_num").value == "") 
+            ? document.getElementById("noVNC_display_num").placeholder 
+            : document.getElementById("noVNC_display_num").value;
+        let username = (document.getElementById("username").value == "") 
+            ? document.getElementById("username").placeholder 
+            : document.getElementById("username").value;
+        UI.forceSetting('path', 'novnc/'+username+'-'+noVNC_display_num+'/websockify');
         const host = UI.getSetting('host');
         const port = UI.getSetting('port');
         const path = UI.getSetting('path');
@@ -1048,7 +1054,7 @@ const UI = {
         UI.rfb.addEventListener("connect", UI.connectFinished);
         UI.rfb.addEventListener("disconnect", UI.disconnectFinished);
         UI.rfb.addEventListener("serververification", UI.serverVerify);
-        UI.rfb.addEventListener("credentialsrequired", UI.credentials);
+        UI.rfb.addEventListener("credentialsrequired", UI.setCredentials);
         UI.rfb.addEventListener("securityfailure", UI.securityFailed);
         UI.rfb.addEventListener("clippingviewport", UI.updateViewDrag);
         UI.rfb.addEventListener("capabilities", UI.updatePowerButton);
@@ -1206,42 +1212,14 @@ const UI = {
  * ==============
  *   PASSWORD
  * ------v------*/
-
-    credentials(e) {
-        // FIXME: handle more types
-
-        document.getElementById("noVNC_username_block").classList.remove("noVNC_hidden");
-        document.getElementById("noVNC_password_block").classList.remove("noVNC_hidden");
-
-        let inputFocus = "none";
-        if (e.detail.types.indexOf("username") === -1) {
-            document.getElementById("noVNC_username_block").classList.add("noVNC_hidden");
-        } else {
-            inputFocus = inputFocus === "none" ? "noVNC_username_input" : inputFocus;
-        }
-        if (e.detail.types.indexOf("password") === -1) {
-            document.getElementById("noVNC_password_block").classList.add("noVNC_hidden");
-        } else {
-            inputFocus = inputFocus === "none" ? "noVNC_password_input" : inputFocus;
-        }
-        document.getElementById('noVNC_credentials_dlg')
-            .classList.add('noVNC_open');
-
-        setTimeout(() => document
-            .getElementById(inputFocus).focus(), 100);
-
-        Log.Warn("Server asked for credentials");
-        UI.showStatus(_("Credentials are required"), "warning");
-    },
-
     setCredentials(e) {
         // Prevent actually submitting the form
         e.preventDefault();
 
-        let inputElemUsername = document.getElementById('noVNC_username_input');
+        let inputElemUsername = document.getElementById('username');
         const username = inputElemUsername.value;
 
-        let inputElemPassword = document.getElementById('noVNC_password_input');
+        let inputElemPassword = document.getElementById('password');
         const password = inputElemPassword.value;
         // Clear the input after reading the password
         inputElemPassword.value = "";
@@ -1726,7 +1704,7 @@ const UI = {
     updateDesktopName(e) {
         UI.desktopName = e.detail.name;
         // Display the desktop name in the document title
-        document.title = e.detail.name + " - " + PAGE_TITLE;
+        document.title = e.detail.name;
     },
 
     bell(e) {
